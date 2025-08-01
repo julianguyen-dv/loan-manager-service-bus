@@ -59,7 +59,7 @@ internal sealed class LoanNotificationConsumer(
         }
 
         var serviceBusClient = serviceProvider.GetRequiredService<ServiceBusClient>();
-        _processor = serviceBusClient.CreateProcessor(queueName:Topics.LoanQueueName);
+        _processor = serviceBusClient.CreateProcessor(queueName: Topics.LoanRequestsQueueName);
 
         _processor.ProcessMessageAsync += ProcessMessageAsync;
         _processor.ProcessErrorAsync += ProcessErrorAsync;

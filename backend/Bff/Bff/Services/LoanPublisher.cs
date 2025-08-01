@@ -1,6 +1,7 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Bff.Interfaces;
 using Loan.Shared.Contracts.Models;
+using Loan.Shared.Contracts.Constants;
 using Loan.Shared.Contracts.Requests;
 using Newtonsoft.Json;
 
@@ -14,7 +15,17 @@ internal class LoanPublisher(ServiceBusClient mainBusClient) : ILoanPublisher
         var envelop = new MessageEnvelope(nameof(LoanSubmissionRequested), commandJson);
         var json = JsonConvert.SerializeObject(envelop);
         await mainBusClient
-             .CreateSender(Loan.Shared.Contracts.Constants.Topics.LoanQueueName)
+             .CreateSender(Topics.LoanRequestsQueueName)
              .SendMessageAsync(new ServiceBusMessage(json), cancellationToken);
+    }
+
+    public async Task PublishLoanDetailsRequestedAsync(LoanDetailsRequested command, CancellationToken ct)
+    {
+        var commandJson = JsonConvert.SerializeObject(command);
+        var envelop = new MessageEnvelope(nameof(LoanDetailsRequested), commandJson);
+        var json = JsonConvert.SerializeObject(envelop);
+        await mainBusClient
+            .CreateSender(Topics.LoanRequestsQueueName)
+            .SendMessageAsync(new ServiceBusMessage(json), ct);
     }
 }

@@ -17,6 +17,8 @@ internal class RedisLoanDraftsRepository([FromKeyedServices("loan-drafts")] ICon
 
     public async Task<LoanEntity?> GetLoanByIdAsync(string loanId) => await storageProvider.GetLoanByIdAsync(loanId);
 
+    public Task<bool> SaveLoanAsync(LoanEntity loan) => storageProvider.SaveLoanAsync(loan);
+
     public async Task<bool> SubmitLoanAsync(string loanId) => await storageProvider.SubmitLoanAsync(loanId);
 
     public async Task<bool> UpdateLoanStatusAsync(string loanId, LoanStatus newStatus) => await storageProvider.UpdateLoanStatusAsync(loanId,(int) newStatus);

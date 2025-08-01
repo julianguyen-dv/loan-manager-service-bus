@@ -3,4 +3,6 @@
 public class Topics
 {
     public const string LoanQueueName = "loan-notifications";
+    public const string LoanRequestsQueueName = "loan-requests";
+    public const string LoanRepliesQueueName = "loan-replies";
 }

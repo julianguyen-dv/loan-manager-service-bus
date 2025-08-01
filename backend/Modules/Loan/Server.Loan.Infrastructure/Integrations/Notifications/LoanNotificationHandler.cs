@@ -1,13 +1,14 @@
-﻿using Azure.Messaging.ServiceBus;
+﻿using System.Text.Json.Nodes;
+using Azure.Messaging.ServiceBus;
 using FastEndpoints;
 using Loan.Shared.Contracts.Abstractions;
+using Loan.Shared.Contracts.Constants;
 using Loan.Shared.Contracts.Models;
 using Loan.Shared.Contracts.Notifications;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Server.Loan.Contracts.Features.Loan.Notifications;
 using Server.Loan.Domain.Aggregates.Loan.DomainEvents;
-using System.Text.Json.Nodes;
 
 namespace Server.Loan.Infrastructure.Integrations.Notifications;
 
@@ -60,7 +61,7 @@ internal class LoanNotificationHandler(ServiceBusClient mainBusClient, ILogger<L
 
             // Send the message to the service bus
             await mainBusClient
-                .CreateSender("loan-notifications")
+                .CreateSender(Topics.LoanQueueName)
                 .SendMessageAsync(new ServiceBusMessage(envelopeJson), cancellationToken);
 
             logger.LogInformation("Successfully processed loan notification: {EventType} for loan {LoanId}", eventType, loanId);

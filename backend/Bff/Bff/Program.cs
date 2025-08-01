@@ -13,6 +13,7 @@ builder.AddAzureServiceBusClient(connectionName: "messaging");
 builder.AddKeyedRedisClient(name: "loan-drafts");
 builder.Services.AddControllers();
 builder.Services.AddTransient<ILoanPublisher, LoanPublisher>();
+builder.Services.AddTransient<ILoanReplyConsumer, LoanReplyConsumer>();
 builder.Services.AddTransient<ILoanDraftStorageProvider, LoanDraftStorageProvider>();
 builder.Services.AddHostedService<LoanNotificationConsumer>();
 builder.Services.AddTransient<LoanSubmittedHandler>();

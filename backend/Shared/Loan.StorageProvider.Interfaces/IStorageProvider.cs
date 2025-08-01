@@ -9,4 +9,5 @@ internal interface IStorageProvider
     Task<LoanEntity?> GetLoanByIdAsync(string loanId);
     Task<bool> SubmitLoanAsync(string loanId);
     Task<bool> UpdateLoanStatusAsync(string loanId, int newStatus);
+    Task<bool> SaveLoanAsync(LoanEntity loan);
 }

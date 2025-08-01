@@ -10,4 +10,5 @@ internal interface ILoanRepository
     Task<LoanEntity> CreateLoanAsync(LoanEntity loan);
     Task<bool> UpdateLoanStatusAsync(string loanId, LoanStatus newStatus);
     Task<bool> SubmitLoanAsync(string loanId);
+    Task<bool> SaveLoanAsync(LoanEntity loan);
 }
