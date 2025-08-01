@@ -12,4 +12,8 @@
     <None Remove="Inquiries\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Responses\" />
+  </ItemGroup>
+
 </Project>

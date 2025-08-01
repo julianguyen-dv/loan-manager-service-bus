@@ -1,6 +1,8 @@
-﻿using Loan.StorageProvider.Models;
+﻿using Loan.StorageProvider.Interfaces;
+using Loan.StorageProvider.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Server.Loan.Domain.Aggregates.Loan.Enums;
+using Server.Loan.Domain.Aggregates.Loan.ValueObjects;
 using Server.Loan.Infrastructure.Interfaces;
 
 namespace Server.Loan.Infrastructure.Services;
@@ -96,5 +98,31 @@ internal class InMemoryLoanRepository : ILoanRepository
     {
         // The submit operation changes the status to Submitted
         return await UpdateLoanStatusAsync(loanId, LoanStatus.Submitted);
+    }
+
+    public async Task<bool> SaveLoanAsync(LoanEntity loan)
+    {
+        var cachedLoan = await GetLoanByIdAsync(loan.LoanId);
+
+        if (cachedLoan == null)
+        {
+            return false;
+        }
+
+        var loans = _memoryCache.Get<List<LoanEntity>>(LOANS_CACHE_KEY) ?? [];
+        var loanId = loan.LoanId;
+
+        // Find the index of the loan in the list
+        int index = loans.FindIndex(l => l.LoanId == loanId);
+
+        if (index == -1)
+        {
+            return false;
+        }
+
+
+        // Update the cache
+        _memoryCache.Set(LOANS_CACHE_KEY, loans);
+        return true;
     }
 }

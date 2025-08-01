@@ -101,4 +101,16 @@ internal class RedisStorageProvider(IConnectionMultiplexer connectionMux) : ISto
 
         return true;
     }
+
+    public async Task<bool> SaveLoanAsync(LoanEntity loan)
+    {
+        // Serialize the updated loan
+        var loanJson = JsonConvert.SerializeObject(loan);
+
+        // Store the updated loan back in Redis
+        string loanKey = LOAN_KEY_PREFIX + loan.LoanId;
+        await _database.StringSetAsync(loanKey, loanJson);
+
+        return true;
+    }
 }

@@ -5,4 +5,5 @@ namespace Bff.Interfaces;
 internal interface ILoanPublisher
 {
     Task PublishLoanSubmittedAsync(LoanSubmissionRequested command, CancellationToken cancellationToken);
+    Task PublishLoanDetailsRequestedAsync(LoanDetailsRequested loanStatusRequest, CancellationToken ct);
 }

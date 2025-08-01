@@ -11,7 +11,7 @@ internal class GetLoansQueryHandler(ILoanRepositoryFactory  loanRepositoryFactor
     public override async Task<Result<GetLoansQueryResponse>> ExecuteAsync(GetLoansQuery command, CancellationToken ct = default)
     {
         var loanRepository = loanRepositoryFactory.Create(Enums.StorageType.Database);
-       var loans= await loanRepository.GetAllLoansAsync();
+        var loans= await loanRepository.GetAllLoansAsync();
 
         var items= loans.Select(loan => new LoanDto(
             Id: loan.LoanId,

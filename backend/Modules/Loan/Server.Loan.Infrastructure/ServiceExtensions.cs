@@ -17,6 +17,7 @@ internal static class ServiceExtensions
         services.AddTransient<ILoanRepositoryFactory, LoanRepositoryFactory>();
         services.AddHostedService<LoanNotificationConsumer>();
         services.AddTransient<SubmitLoanRequestHandler>();
+        services.AddTransient<GetLoanDetailsRequestHandler>();
         services.AddTransient<IStartupFilter, MessageHandlerRegistrationStartupFilter>();
         services.AddSchemaValidators();
         return services;

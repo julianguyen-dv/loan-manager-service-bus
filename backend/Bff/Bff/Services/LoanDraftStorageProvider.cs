@@ -18,4 +18,6 @@ internal class LoanDraftStorageProvider([FromKeyedServices("loan-drafts")] IConn
     public Task<bool> SubmitLoanAsync(string loanId) => storageProvider.SubmitLoanAsync(loanId);
 
     public Task<bool> UpdateLoanStatusAsync(string loanId, int newStatus) => storageProvider.UpdateLoanStatusAsync(loanId, newStatus);
+
+    public Task<bool> SaveLoanAsync(LoanEntity loan) => storageProvider.SaveLoanAsync(loan);
 }

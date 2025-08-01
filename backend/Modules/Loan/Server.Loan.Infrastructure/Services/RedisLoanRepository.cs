@@ -20,4 +20,6 @@ internal class RedisLoanRepository([FromKeyedServices("loan-database")] IConnect
     public async Task<bool> SubmitLoanAsync(string loanId)=> await storageProvider.SubmitLoanAsync(loanId);
 
     public async Task<bool> UpdateLoanStatusAsync(string loanId, LoanStatus newStatus) => await storageProvider.UpdateLoanStatusAsync(loanId,(int) newStatus);
+
+    public Task<bool> SaveLoanAsync(LoanEntity loan) => storageProvider.SaveLoanAsync(loan);
 }

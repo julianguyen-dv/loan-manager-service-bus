@@ -42,6 +42,8 @@ var loanDatabase = builder.AddRedis("loan-database");
 
 // Add topic separately for better readability and control
 serviceBus.AddServiceBusQueue("loan-notifications");
+var pointToPointQueue = serviceBus.AddServiceBusQueue("loan-replies");
+pointToPointQueue.Resource.RequiresSession = true;
 
 // Add projects with reference to Service Bus
 var server = builder.AddProject<Projects.Server>("server")
