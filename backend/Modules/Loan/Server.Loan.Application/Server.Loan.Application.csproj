@@ -13,13 +13,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Loan.Shared.Contracts\Loan.Shared.Contracts.csproj" />
     <ProjectReference Include="..\Server.Loan.Domain\Server.Loan.Domain.csproj" />
   </ItemGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Server.Loan.Infrastructure" />
 		<InternalsVisibleTo Include="Server.Loan.EndPoints" />
-		<InternalsVisibleTo Include="Server.Loan.Module"/>
+		<InternalsVisibleTo Include="Server.Loan.Module" />
 	</ItemGroup>
 
 </Project>

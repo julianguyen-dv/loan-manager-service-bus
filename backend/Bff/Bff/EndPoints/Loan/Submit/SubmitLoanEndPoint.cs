@@ -1,5 +1,6 @@
 ﻿using Bff.Interfaces;
 using FastEndpoints;
+using Loan.Shared.Contracts.Common;
 using Loan.Shared.Contracts.Requests;
 using Loan.StorageProvider.Models;
 
@@ -44,9 +45,22 @@ internal class SubmitLoanEndPoint(ILoanDraftStorageProvider draftStorageProvider
 
         var draftCreationResult = await draftStorageProvider.CreateLoanAsync(draft);
 
-
         //3.- Publish the loan creation event to the message broker
-        var draftCreationRequest = new LoanSubmissionRequested(draftCreationResult.LoanId);
+        var draftDto = new LoanDetails(
+                Id: draft.LoanId,
+                LoanAmount: draft.LoanAmount,
+                LoanTerm: draft.LoanTerm,
+                LoanPurpose: draft.LoanPurpose,
+                BankAccountNumber: draft.BankInformation.AccountNumber,
+                BankAccountType: draft.BankInformation.AccountType,
+                BankName: draft.BankInformation.BankName,
+                FullName: draft.PersonalInformation.FullName,
+                Email: draft.PersonalInformation.Email,
+                DateOfBirth: draft.PersonalInformation.DateOfBirth.ToDateTime(TimeOnly.MinValue),
+                LoanStatus: -1
+            );
+
+        var draftCreationRequest = new LoanSubmissionRequested(draftDto);
 
         await loanPublisher.PublishLoanSubmittedAsync(draftCreationRequest, ct);
 

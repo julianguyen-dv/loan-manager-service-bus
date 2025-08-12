@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Server.Loan.Application.Features.Loan.CreateLoan;
 using Server.Loan.Application.Interfaces;
 using Server.Loan.Contracts.Features.Loan.SubmitLoan;
-using Server.Loan.Infrastructure.Interfaces;
 
 namespace Server.Loan.Infrastructure.Services.Handlers;
 
@@ -15,7 +14,6 @@ namespace Server.Loan.Infrastructure.Services.Handlers;
 /// </summary>
 internal class SubmitLoanRequestHandler(
     ILogger<SubmitLoanRequestHandler> logger, 
-    ILoanRepositoryFactory loanRepositoryFactory,
     ISchemaValidator schemaValidator
     ) : IMessageHandler
 {
@@ -39,30 +37,27 @@ internal class SubmitLoanRequestHandler(
         }
 
 
-        logger.LogInformation("Processing loan submission request for ID {LoanId}", draftLoanSubmission.LoanId);
+        logger.LogInformation("Processing loan submission request for ID {LoanId}", draftLoanSubmission.LoanDetails.Id);
 
-        var loanDraftsRepository = loanRepositoryFactory.Create(Enums.StorageType.Draft);
-        var draft = await loanDraftsRepository.GetLoanByIdAsync(draftLoanSubmission.LoanId);
+        var draft = draftLoanSubmission.LoanDetails;
 
         if (draft is null)
         {
-            logger.LogError("Loan with ID {LoanId} not found", draftLoanSubmission.LoanId);
+            logger.LogError("Loan with ID {LoanId} not found", draftLoanSubmission.LoanDetails.Id);
             return;
         }
 
-        var createCommand = new CreateLoanCommand(draft.LoanId);
+        var createCommand = new CreateLoanCommand(draft);
         var createLoanResult = await createCommand.ExecuteAsync(cancellationToken);
 
         if(!createLoanResult.IsSuccess)
         {
             // send notification that loan creation failed
-            logger.LogError("Failed to create loan with ID {LoanId}", draftLoanSubmission.LoanId);
+            logger.LogError("Failed to create loan with ID {LoanId}", draft.Id);
             return;
         }
 
-
-
-        logger.LogInformation("Loan with ID {LoanId} successfully created", draftLoanSubmission.LoanId);
+        logger.LogInformation("Loan with ID {LoanId} successfully created", draft.Id);
         var createdLoanId = createLoanResult.Value.LoanId;
         var submitLoanCommand = new SubmitLoanCommand(createdLoanId);
 
@@ -70,7 +65,7 @@ internal class SubmitLoanRequestHandler(
         if (!submitLoanResult.IsSuccess)
         {
             // send notification that loan submission failed
-            logger.LogError("Failed to submit loan with ID {LoanId}", draftLoanSubmission.LoanId);
+            logger.LogError("Failed to submit loan with ID {LoanId}", draft.Id);
             return;
         }
  

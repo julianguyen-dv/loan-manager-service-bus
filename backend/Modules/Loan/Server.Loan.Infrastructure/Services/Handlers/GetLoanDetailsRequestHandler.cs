@@ -38,8 +38,6 @@ internal class GetLoanDetailsRequestHandler(
 
         logger.LogInformation("Fetching loan information for ID {LoanId}", loanDetailsRequest.LoanId);
 
-        // Check if the loan exists in the draft storage
-
         // Delegate to command handler to fetch loan details
         var getLoanDetailsCommand = new FetchLoanQuery(loanDetailsRequest.LoanId);
         var getLoanDetailsResult = await getLoanDetailsCommand.ExecuteAsync(cancellationToken);

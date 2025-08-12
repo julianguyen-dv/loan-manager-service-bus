@@ -14,26 +14,20 @@ internal class CreateLoanCommandHandler(ILoanRepositoryFactory loanRepositoryFac
 {
     public override async Task<Result<CreateLoanCommandResponse>> ExecuteAsync(CreateLoanCommand command, CancellationToken ct = default)
     {
-        var loanDraftRepository = loanRepositoryFactory.Create(StorageType.Draft);
+        var loanDraft = command.LoanDetails;
 
-        var loanDraft = await loanDraftRepository.GetLoanByIdAsync(command.DraftLoanId);
-
-        if (loanDraft is null)
-        {
-            return Result<CreateLoanCommandResponse>.NotFound($"Loan draft with ID {command.DraftLoanId} not found.");
-        }
         // Validate personal information
         var personalInformationResult = Domain.Aggregates.Loan.Entities.PersonalInformation.Create(
-            fullName: loanDraft.PersonalInformation.FullName,
-            email: loanDraft.PersonalInformation.Email,
-            dateOfBirth: loanDraft.PersonalInformation.DateOfBirth
+            fullName: loanDraft.FullName,
+            email: loanDraft.Email,
+            dateOfBirth: DateOnly.FromDateTime(loanDraft.DateOfBirth)
         );
 
         // Validate bank information
         var bankInformationResult = Domain.Aggregates.Loan.Entities.BankInformation.Create(
-            accountNumber: loanDraft.BankInformation.AccountNumber,
-            accountType: loanDraft.BankInformation.AccountType,
-            bankName: loanDraft.BankInformation.BankName
+            accountNumber: loanDraft.BankAccountNumber,
+            accountType: loanDraft.BankAccountType,
+            bankName: loanDraft.BankName
         );
 
         // STEP 2: Return early if validation fails
@@ -77,7 +71,7 @@ internal class CreateLoanCommandHandler(ILoanRepositoryFactory loanRepositoryFac
             return loanCreationResult.Map();
         }
 
-        var assignDraftResult = loan.AssignLoanDraftId(new LoanId(new Guid(loanDraft.LoanId)));
+        var assignDraftResult = loan.AssignLoanDraftId(new LoanId(new Guid(loanDraft.Id)));
 
         if (!assignDraftResult.IsSuccess)
         {

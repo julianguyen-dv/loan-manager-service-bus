@@ -48,7 +48,7 @@ var loanRepliesQueue = serviceBus.AddServiceBusQueue("loan-replies");
 loanRepliesQueue.Resource.RequiresSession = true;
 
 // Add projects with reference to Service Bus
-var server = builder.AddProject<Projects.Server>("server")
+var server = builder.AddProject<Projects.Server>("ibp")
     .WithExternalHttpEndpoints()
     .WithReference(serviceBus)
     .WaitFor(serviceBus)
@@ -57,7 +57,7 @@ var server = builder.AddProject<Projects.Server>("server")
     .WithReference(loanDatabase)
     .WaitFor(loanDatabase);
 
-builder.AddProject<Projects.Bff>("bff")
+builder.AddProject<Projects.Bff>("marunavi")
     .WithExternalHttpEndpoints()
     .WithReference(serviceBus)
     .WithReference(loanDrafts)
