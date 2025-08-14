@@ -12,6 +12,13 @@ internal class LoanReplyConsumer(
 {
     public async Task<LoanDetailsResponse> ReceiveLoanDetailsAsync(LoanDetailsRequested request, CancellationToken ct)
     {
+        // Define the maxmimum time to wait for the reply to be received
+        var timeout = TimeSpan.FromSeconds(3);
+
+        // Create a cancellation token that will cancel after the timeout period
+        var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        linkedCts.CancelAfter(timeout);
+
         try
         {
             if (request == null)
@@ -23,7 +30,7 @@ internal class LoanReplyConsumer(
                 request.SessionId,
                 cancellationToken: ct);
 
-            ServiceBusReceivedMessage receivedMessage = await receiver.ReceiveMessageAsync(cancellationToken: ct) ?? throw new InvalidOperationException($"No message received for loan ID {request.LoanId}");
+            ServiceBusReceivedMessage receivedMessage = await receiver.ReceiveMessageAsync(cancellationToken: linkedCts.Token) ?? throw new InvalidOperationException($"No message received for loan ID {request.LoanId}");
 
             var body = receivedMessage.Body.ToString();
             logger.LogInformation("Received message for loan ID {LoanId}: {Body}", request.LoanId, body);
@@ -36,6 +43,13 @@ internal class LoanReplyConsumer(
 
             await receiver.CompleteMessageAsync(receivedMessage, ct);
             return loanDetailsResponse;
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("Timeout while waiting for loan details for request {Request}", request);
+
+            // Handle the timeout by throwing an exception or returning a default value
+            throw new TimeoutException($"No response received for loan ID {request.LoanId} within the timeout period of {timeout.TotalSeconds} seconds.");
         }
         catch (Exception ex)
         {
